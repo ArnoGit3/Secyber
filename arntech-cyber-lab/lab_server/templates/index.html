@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+{% block title %}ARNTECH CYBER LAB - Enterprise Security Dashboard{% endblock %}
+{% block content %}
+
+<div class="page-header-banner">
+  <div class="page-title">
+    <span>🛡️</span> Enterprise Cyber Security & Audit Operations Dashboard
+  </div>
+  <p class="page-desc">
+    Commercial-grade vulnerability testing suite, carding integrity auditor, and payment gateway security environment.
+    Toggle module security controls to verify real-time remediation against active attack vectors.
+  </p>
+</div>
+
+<div class="panel">
+  <h2>💳 Payment Gateway & Card Security Operations</h2>
+  <div class="grid-2" style="margin-top: 16px;">
+    <div class="module-card">
+      <div>
+        <div class="module-title-row">
+          <span class="module-name">Commercial Payment Gateway & Carding Audit</span>
+          <span class="pill pill-approved">ACTIVE AUDITOR</span>
+        </div>
+        <div class="module-desc">
+          Real-time Luhn Modulo-10 checksum validation, Bank Identification Number (BIN) lookup engine, card tier identification, and simulated commercial payment gateway authorization engine.
+        </div>
+      </div>
+      <div class="module-actions">
+        <a href="{{ url_for('payment_verification') }}" class="btn">Launch Gateway Auditor &rarr;</a>
+      </div>
+    </div>
+
+    <div class="module-card">
+      <div>
+        <div class="module-title-row">
+          <span class="module-name">Credential Security & Portal Audit</span>
+          <span class="pill pill-pass">MONITORED</span>
+        </div>
+        <div class="module-desc">
+          Simulated enterprise authentication portal audit, password form security inspection, and credential exposure vulnerability verification.
+        </div>
+      </div>
+      <div class="module-actions">
+        <a href="{{ url_for('training_login') }}" class="btn btn-secondary">Launch Portal Audit &rarr;</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="panel">
+  <h2>⚡ Enterprise Security Audit Modules</h2>
+  <div class="grid-3" style="margin-top: 16px;">
+
+    <!-- SQLi Module -->
+    <div class="module-card">
+      <div>
+        <div class="module-title-row">
+          <span class="module-name">SQL Injection Audit</span>
+          <span class="pill {{ 'pill-high' if state.sqli else 'pill-pass' }}">
+            {{ 'VULNERABLE' if state.sqli else 'SECURE HARDENED' }}
+          </span>
+        </div>
+        <div class="module-desc">Database query parameterization audit and unsanitized string injection verification.</div>
+      </div>
+      <div class="module-actions">
+        <a href="{{ url_for('sqli_lab') }}" class="btn btn-secondary">Audit Endpoint</a>
+        <a href="{{ url_for('toggle_lab', lab='sqli') }}" class="btn {{ 'btn-danger' if state.sqli else 'btn-success' }}">
+          {{ 'Fix Flaw' if state.sqli else 'Make Vuln' }}
+        </a>
+      </div>
+    </div>
+
+    <!-- XSS Module -->
+    <div class="module-card">
+      <div>
+        <div class="module-title-row">
+          <span class="module-name">XSS Security Audit</span>
+          <span class="pill {{ 'pill-high' if state.xss else 'pill-pass' }}">
+            {{ 'VULNERABLE' if state.xss else 'SECURE HARDENED' }}
+          </span>
+        </div>
+        <div class="module-desc">Reflected and stored Cross-Site Scripting (XSS) context escaping verification.</div>
+      </div>
+      <div class="module-actions">
+        <a href="{{ url_for('xss_lab') }}" class="btn btn-secondary">Audit Endpoint</a>
+        <a href="{{ url_for('toggle_lab', lab='xss') }}" class="btn {{ 'btn-danger' if state.xss else 'btn-success' }}">
+          {{ 'Fix Flaw' if state.xss else 'Make Vuln' }}
+        </a>
+      </div>
+    </div>
+
+    <!-- Command Injection Module -->
+    <div class="module-card">
+      <div>
+        <div class="module-title-row">
+          <span class="module-name">Command Injection</span>
+          <span class="pill {{ 'pill-high' if state.cmdinject else 'pill-pass' }}">
+            {{ 'VULNERABLE' if state.cmdinject else 'SECURE HARDENED' }}
+          </span>
+        </div>
+        <div class="module-desc">Subprocess shell execution safety audit and raw input string concatenation checks.</div>
+      </div>
+      <div class="module-actions">
+        <a href="{{ url_for('cmdinject_lab') }}" class="btn btn-secondary">Audit Endpoint</a>
+        <a href="{{ url_for('toggle_lab', lab='cmdinject') }}" class="btn {{ 'btn-danger' if state.cmdinject else 'btn-success' }}">
+          {{ 'Fix Flaw' if state.cmdinject else 'Make Vuln' }}
+        </a>
+      </div>
+    </div>
+
+    <!-- Auth Module -->
+    <div class="module-card">
+      <div>
+        <div class="module-title-row">
+          <span class="module-name">Authentication & Lockout</span>
+          <span class="pill {{ 'pill-high' if state.auth else 'pill-pass' }}">
+            {{ 'VULNERABLE' if state.auth else 'SECURE HARDENED' }}
+          </span>
+        </div>
+        <div class="module-desc">Username enumeration protection and brute-force rate-limiting lockout policy audit.</div>
+      </div>
+      <div class="module-actions">
+        <a href="{{ url_for('auth_lab') }}" class="btn btn-secondary">Audit Endpoint</a>
+        <a href="{{ url_for('toggle_lab', lab='auth') }}" class="btn {{ 'btn-danger' if state.auth else 'btn-success' }}">
+          {{ 'Fix Flaw' if state.auth else 'Make Vuln' }}
+        </a>
+      </div>
+    </div>
+
+    <!-- API Security Module -->
+    <div class="module-card">
+      <div>
+        <div class="module-title-row">
+          <span class="module-name">REST API Security</span>
+          <span class="pill {{ 'pill-high' if state.api else 'pill-pass' }}">
+            {{ 'VULNERABLE' if state.api else 'SECURE HARDENED' }}
+          </span>
+        </div>
+        <div class="module-desc">Excessive data exposure and API key header authorization enforcement audit.</div>
+      </div>
+      <div class="module-actions">
+        <a href="{{ url_for('api_lab_page') }}" class="btn btn-secondary">Audit Endpoint</a>
+        <a href="{{ url_for('toggle_lab', lab='api') }}" class="btn {{ 'btn-danger' if state.api else 'btn-success' }}">
+          {{ 'Fix Flaw' if state.api else 'Make Vuln' }}
+        </a>
+      </div>
+    </div>
+
+    <!-- File Upload Module -->
+    <div class="module-card">
+      <div>
+        <div class="module-title-row">
+          <span class="module-name">File Upload Policy</span>
+          <span class="pill {{ 'pill-high' if state.upload else 'pill-pass' }}">
+            {{ 'VULNERABLE' if state.upload else 'SECURE HARDENED' }}
+          </span>
+        </div>
+        <div class="module-desc">Extension allowlisting, MIME verification, and file size restriction security audit.</div>
+      </div>
+      <div class="module-actions">
+        <a href="{{ url_for('upload_lab') }}" class="btn btn-secondary">Audit Endpoint</a>
+        <a href="{{ url_for('toggle_lab', lab='upload') }}" class="btn {{ 'btn-danger' if state.upload else 'btn-success' }}">
+          {{ 'Fix Flaw' if state.upload else 'Make Vuln' }}
+        </a>
+      </div>
+    </div>
+
+    <!-- Headers Module -->
+    <div class="module-card">
+      <div>
+        <div class="module-title-row">
+          <span class="module-name">HTTP Security Headers</span>
+          <span class="pill {{ 'pill-high' if state.headers else 'pill-pass' }}">
+            {{ 'VULNERABLE' if state.headers else 'SECURE HARDENED' }}
+          </span>
+        </div>
+        <div class="module-desc">CSP, HSTS, X-Frame-Options, and Referrer-Policy HTTP response header audit.</div>
+      </div>
+      <div class="module-actions">
+        <a href="{{ url_for('headers_lab') }}" class="btn btn-secondary">Audit Endpoint</a>
+        <a href="{{ url_for('toggle_lab', lab='headers') }}" class="btn {{ 'btn-danger' if state.headers else 'btn-success' }}">
+          {{ 'Fix Flaw' if state.headers else 'Make Vuln' }}
+        </a>
+      </div>
+    </div>
+
+    <!-- Session Security Module -->
+    <div class="module-card">
+      <div>
+        <div class="module-title-row">
+          <span class="module-name">Session & Cookies</span>
+          <span class="pill {{ 'pill-high' if state.session else 'pill-pass' }}">
+            {{ 'VULNERABLE' if state.session else 'SECURE HARDENED' }}
+          </span>
+        </div>
+        <div class="module-desc">Cookie HttpOnly, SameSite Lax/Strict, and Secure flag enforcement audit.</div>
+      </div>
+      <div class="module-actions">
+        <a href="{{ url_for('session_lab') }}" class="btn btn-secondary">Audit Endpoint</a>
+        <a href="{{ url_for('toggle_lab', lab='session') }}" class="btn {{ 'btn-danger' if state.session else 'btn-success' }}">
+          {{ 'Fix Flaw' if state.session else 'Make Vuln' }}
+        </a>
+      </div>
+    </div>
+
+    <!-- Password Storage Module -->
+    <div class="module-card">
+      <div>
+        <div class="module-title-row">
+          <span class="module-name">Cryptographic Hashes</span>
+          <span class="pill pill-pass">BENCHMARK</span>
+        </div>
+        <div class="module-desc">Comparative audit of plaintext database storage vs bcrypt/PBKDF2 salted password hashes.</div>
+      </div>
+      <div class="module-actions">
+        <a href="{{ url_for('password_lab') }}" class="btn btn-secondary">Audit Endpoint &rarr;</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="panel">
+  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <h3 style="margin-bottom: 4px;">System Controls & Data Reset</h3>
+      <p style="color: var(--text-muted); font-size: 13px;">Clear all stored transaction logs, credential attempts, and reset module databases to baseline configuration.</p>
+    </div>
+    <a href="{{ url_for('reset_lab_data') }}" class="btn btn-danger">Reset System Audit Database</a>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}ARNTECH - Enterprise Portal Replication Audit{% endblock %}
+{% block content %}
+
+<div class="page-header-banner">
+  <div class="page-title">
+    <span>🌐</span> Enterprise Portal Replication & Domain Audit
+  </div>
+  <p class="page-desc">
+    Audits page cloning and domain typosquatting attack surfaces. Demonstrates brand protection, certificate transparency monitoring, and origin domain validation controls.
+  </p>
+</div>
+
+<div class="panel">
+  <h2>{{ university }} Enterprise Member Portal</h2>
+  <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">
+    Replicated interface inspection endpoint. Evaluates visual design fidelity vs domain origin signature.
+  </p>
+  <form>
+    <div class="form-group">
+      <label>Corporate Access Identifier</label>
+      <input type="text" placeholder="e.g. EMP-2026-991" class="input-mono" disabled>
+    </div>
+    <div class="form-group">
+      <label>Security Keyphrase</label>
+      <input type="password" placeholder="••••••••" class="input-mono" disabled>
+    </div>
+    <button type="button" class="btn btn-secondary" disabled style="opacity: 0.6; cursor: not-allowed;">
+      Sign In (Static Replica Audit)
+    </button>
+  </form>
+</div>
+
+<div class="panel">
+  <h3>Defensive Audit Strategy</h3>
+  <ul>
+    <li><b>Domain Typosquatting & Brand Protection:</b> Monitor newly registered domains matching company trademarks in Certificate Transparency (CT) logs.</li>
+    <li><b>Origin Domain Cryptographic Binding:</b> FIDO2/WebAuthn passkeys bind public-key credentials to verified origin domains (<code>arntech-security.internal</code>), preventing authentication token replay on unauthorized domains.</li>
+  </ul>
+</div>
+
+{% endblock %}

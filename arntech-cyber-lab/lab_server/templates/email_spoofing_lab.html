@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}ARNTECH - Email Header & Domain Spoofing Audit{% endblock %}
+{% block content %}
+
+<div class="page-header-banner">
+  <div class="page-title">
+    <span>📧</span> Email Authentication Header & Domain Security Audit
+  </div>
+  <p class="page-desc">
+    Audits SMTP message header origin signatures. Evaluates SPF (Sender Policy Framework), DKIM (DomainKeys Identified Mail), and DMARC enforcement policies.
+  </p>
+</div>
+
+<div class="panel">
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+    <h3>Simulated Message Header Inspection</h3>
+    <span class="pill pill-high">SPOOFED HEADER DETECTED</span>
+  </div>
+
+  <pre class="code-block">{% for k, v in headers.items() %}{{ k }}: {{ v }}
+{% endfor %}</pre>
+
+  <p style="color: var(--text-muted); font-size: 14px; margin-top: 14px;">
+    The RFC 5322 <code>From:</code> display header claims origin from <code>security@arntech-security.internal</code>, but lower-level headers (<code>Reply-To</code>, <code>Return-Path</code>, and <code>Received</code>) reveal actual transmission from an unverified external node.
+  </p>
+</div>
+
+<div class="panel">
+  <h3>Domain Verification & Defense Protocol Breakdown</h3>
+  <ul>
+    <li><b>SPF (Sender Policy Framework) [Result: FAIL]:</b> The IP address of the sending server is not authorized in the target domain's DNS TXT record.</li>
+    <li><b>DKIM (DomainKeys Identified Mail) [Result: NONE]:</b> No valid cryptographic RSA signature present to verify message body integrity.</li>
+    <li><b>DMARC (Domain-based Message Authentication) [Result: FAIL]:</b> SPF and DKIM alignment checks failed against the visible From header domain.</li>
+  </ul>
+</div>
+
+{% endblock %}

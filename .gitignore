@@ -1,0 +1,73 @@
+# Python Bytecode & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual Environments
+venv/
+env/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# SQLite Database & Runtime Data
+*.db
+*.sqlite
+*.sqlite3
+data/*.db
+data/lab.db
+
+# Log Files & Audit Data
+*.log
+logs/
+data/logs/
+
+# Uploaded Artifacts & Media
+data/uploads/*
+!data/uploads/.gitkeep
+data/synthetic_data/uploads/*
+!data/synthetic_data/uploads/.gitkeep
+
+# Generated HTML Security Reports
+reports/*.html
+!reports/.gitkeep
+
+# Environment Files & Secrets
+.env
+.env.local
+.env.*
+*.key
+*.pem
+*.p12
+*.pfx
+secrets.yaml
+secrets.json
+
+# IDE & Editor Specific Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Windows OS Artifacts
+desktop.ini
+$RECYCLE.BIN/
+
+# Node / Frontend (if added later)
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Coverage & Testing Artifacts
+.coverage
+htmlcov/
+coverage.xml

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}ARNTECH - Session & Cookie Security Audit{% endblock %}
+{% block content %}
+
+<div class="page-header-banner">
+  <div class="page-title">
+    <span>🍪</span> Session Token & Cookie Attribute Security Audit
+  </div>
+  <p class="page-desc">
+    Audits HTTP session cookie flags. Verifies HttpOnly script-access mitigation, SameSite CSRF policy restriction, and Secure transport flag enforcement.
+  </p>
+</div>
+
+<div class="panel">
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+    <h3>Active Session Cookie Attributes</h3>
+    <span class="pill {{ 'pill-high' if vulnerable else 'pill-pass' }}">
+      MODE: {{ 'VULNERABLE (UNPROTECTED COOKIE)' if vulnerable else 'SECURE (HTTPONLY + SAMESITE)' }}
+    </span>
+  </div>
+
+  <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 14px;">
+    Inspect HTTP Response Header: <code>Set-Cookie: arntech_enterprise_session</code>
+  </p>
+
+  {% if vulnerable %}
+  <pre class="code-block">Set-Cookie: arntech_enterprise_session=c9a2f1b4-8e3d...; Path=/
+# VULNERABLE: Exposed to JavaScript document.cookie & Cross-Site Requests</pre>
+  {% else %}
+  <pre class="code-block">Set-Cookie: arntech_enterprise_session=c9a2f1b4-8e3d...; Path=/; HttpOnly; SameSite=Lax
+# SECURE: Protected from DOM script exfiltration and CSRF vectors</pre>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h3>Technical Audit Analysis</h3>
+  <ul>
+    <li><b>HttpOnly Attribute:</b> Prevents client-side scripts from accessing session tokens via <code>document.cookie</code>, neutralizing session hijacking via Cross-Site Scripting (XSS).</li>
+    <li><b>SameSite Attribute (Strict/Lax):</b> Prevents browsers from automatically attaching session cookies to cross-origin requests, blocking Cross-Site Request Forgery (CSRF).</li>
+    <li><b>Secure Attribute:</b> Restricts cookie transmission strictly to encrypted HTTPS channels, preventing session interception over plaintext HTTP networks.</li>
+  </ul>
+</div>
+
+{% endblock %}

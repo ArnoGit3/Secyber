@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}ARNTECH - HTTP Security Headers Audit{% endblock %}
+{% block content %}
+
+<div class="page-header-banner">
+  <div class="page-title">
+    <span>🌐</span> HTTP Security Headers Compliance Audit
+  </div>
+  <p class="page-desc">
+    Scans defensive HTTP response headers. Evaluates Content-Security-Policy, X-Frame-Options, Strict-Transport-Security, and MIME sniffing protection.
+  </p>
+</div>
+
+<div class="panel">
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+    <h3>Active HTTP Response Header State</h3>
+    <span class="pill {{ 'pill-high' if vulnerable else 'pill-pass' }}">
+      MODE: {{ 'VULNERABLE (MISSING DEFENSIVE HEADERS)' if vulnerable else 'SECURE (HARDENED HEADER POLICY)' }}
+    </span>
+  </div>
+
+  {% if vulnerable %}
+  <pre class="code-block"># Response headers (VULNERABLE)
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Server: Werkzeug/Flask
+
+# WARNING: Missing CSP, X-Frame-Options, HSTS, Nosniff, Referrer-Policy</pre>
+  {% else %}
+  <pre class="code-block"># Response headers (SECURE)
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Content-Security-Policy: default-src 'self'
+X-Frame-Options: DENY
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+Permissions-Policy: geolocation=(), microphone=(), camera=()
+Strict-Transport-Security: max-age=63072000; includeSubDomains</pre>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h3>Technical Audit Analysis</h3>
+  <ul>
+    <li><b>Content-Security-Policy (CSP):</b> Restricts script execution sources to trusted domains, mitigating script injection attacks.</li>
+    <li><b>X-Frame-Options (DENY):</b> Prevents UI redress and clickjacking attacks by blocking iframe embedding.</li>
+    <li><b>X-Content-Type-Options (nosniff):</b> Disables MIME-type sniffing, preventing executable payloads disguised as static assets.</li>
+    <li><b>Strict-Transport-Security (HSTS):</b> Forces browsers to communicate exclusively over encrypted TLS/HTTPS protocols.</li>
+  </ul>
+</div>
+
+{% endblock %}

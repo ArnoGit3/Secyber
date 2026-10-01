@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}ARNTECH - REST API Security & Data Exposure Audit{% endblock %}
+{% block content %}
+
+<div class="page-header-banner">
+  <div class="page-title">
+    <span>🔌</span> REST API Security & Excessive Data Exposure Audit
+  </div>
+  <p class="page-desc">
+    Audits RESTful API endpoint authorization controls. Tests header-based API key authentication and schema data minimization principles.
+  </p>
+</div>
+
+<div class="panel">
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+    <h3>Target Endpoint: GET /api/accounts</h3>
+    <span class="pill {{ 'pill-high' if vulnerable else 'pill-pass' }}">
+      MODE: {{ 'VULNERABLE (UNAUTHENTICATED EXPOSURE)' if vulnerable else 'SECURE (API KEY REQUIRED)' }}
+    </span>
+  </div>
+
+  {% if vulnerable %}
+  <pre class="code-block"># Unauthenticated cURL call
+curl http://127.0.0.1:5000/api/accounts
+
+# VULNERABLE: Returns full internal accounts schema (Tokens, Internal Notes, Emails)</pre>
+  {% else %}
+  <pre class="code-block"># Unauthenticated call
+curl http://127.0.0.1:5000/api/accounts
+# -> HTTP/1.1 401 Unauthorized
+
+# Authenticated call with API Key Header
+curl -H "X-ARNTECH-API-KEY: demo-enterprise-key" http://127.0.0.1:5000/api/accounts
+# -> SECURE: Returns minimal public schema only [{"username": "sys.auditor1"}]</pre>
+  {% endif %}
+
+  <div style="margin-top: 20px;">
+    <a class="btn" href="{{ url_for('api_accounts') }}" target="_blank">Execute Endpoint GET Request in New Tab &rarr;</a>
+  </div>
+</div>
+
+<div class="panel">
+  <h3>Technical Audit Analysis</h3>
+  <ul>
+    <li><b>Broken Object Level Authorization (BOLA):</b> APIs must validate requestor identity and object ownership on every endpoint.</li>
+    <li><b>Excessive Data Exposure:</b> Returning backend models directly to clients leaks sensitive token metadata and internal fields.</li>
+    <li><b>API Key Header Enforcement:</b> Mandatory validation of custom API authentication headers (e.g. <code>X-ARNTECH-API-KEY</code>) before servicing requests.</li>
+  </ul>
+</div>
+
+{% endblock %}

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}ARNTECH CYBER LAB - Enterprise Security Suite{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<header class="arntech-header">
+    <div class="header-container">
+        <div class="brand-wrapper">
+            <div class="brand-logo-icon">A</div>
+            <div>
+                <div class="brand-title">ARNTECH <span>CYBER LAB</span></div>
+                <div class="tagline-text">Enterprise Cyber Security & Payment Gateway Audit Suite</div>
+            </div>
+        </div>
+        <div class="status-badge-group">
+            <div class="status-badge live">
+                <span class="pulse-dot"></span> SECURE LAB ENVIRONMENT
+            </div>
+            <div class="status-badge">
+                ENV: LOCALHOST SUITE
+            </div>
+            <div class="status-badge">
+                MODE: AUDIT & DEFENSE
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="arntech-main">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash-box">
+          <span style="font-size: 18px;">ℹ</span>
+          <div>
+            {% for m in messages %}<p>{{ m }}</p>{% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="arntech-footer">
+    <p>ARNTECH ENTERPRISE CYBER LAB — Secure Internal Audit & Payment Gateway Testing Environment</p>
+    <p style="margin-top: 6px;"><a href="{{ url_for('index') }}">&larr; Return to Enterprise Dashboard</a></p>
+</footer>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

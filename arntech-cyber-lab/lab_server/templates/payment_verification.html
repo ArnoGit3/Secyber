@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% block title %}ARNTECH - Commercial Payment Gateway & Carding Security Audit{% endblock %}
+{% block content %}
+
+<div class="page-header-banner">
+  <div class="page-title">
+    <span>💳</span> Commercial Payment Gateway & Carding Audit Suite
+  </div>
+  <p class="page-desc">
+    Full commercial payment authorization and card security laboratory. Evaluates real-time Modulo-10 (Luhn) checksum integrity, Bank Identification Number (BIN) lookup parameters, CVV validation, and simulated payment gateway transaction responses.
+  </p>
+</div>
+
+<div class="grid-2">
+
+  <!-- Form Column -->
+  <div class="panel">
+    <h2>Transaction & Card Verification Terminal</h2>
+    <form method="POST" id="payment-audit-form">
+      
+      <div class="form-group">
+        <label>Cardholder Full Name</label>
+        <input type="text" name="cardholder" id="cardholder" value="Alex R. Vance" placeholder="Name on card" required>
+      </div>
+
+      <div class="form-group">
+        <label>Primary Account Number (PAN / Card Number)</label>
+        <input type="text" name="card_number" id="card_number" class="input-mono" value="4111 1111 1111 1111" placeholder="Enter 13-19 digit card number" autocomplete="off" required>
+        <small style="color: var(--text-dim); font-size: 11px; margin-top: 4px; display: block;">
+          Live BIN lookup & Luhn check active. Supports Visa, MC, Amex, Discover, JCB, UnionPay, Diners.
+        </small>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="form-group">
+          <label>Expiration (MM/YY)</label>
+          <input type="text" name="expiry" id="expiry" class="input-mono" value="12/28" placeholder="MM/YY" required>
+        </div>
+        <div class="form-group">
+          <label>CVV / CVC Code</label>
+          <input type="text" name="cvv" id="cvv" class="input-mono" value="888" placeholder="3 or 4 digits" maxlength="4" required>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="form-group">
+          <label>Audit Amount</label>
+          <input type="number" step="0.01" name="amount" value="49.99" class="input-mono" required>
+        </div>
+        <div class="form-group">
+          <label>Currency</label>
+          <select name="currency" class="input-mono">
+            <option value="USD">USD ($)</option>
+            <option value="EUR">EUR (€)</option>
+            <option value="GBP">GBP (£)</option>
+            <option value="KES">KES (KSh)</option>
+            <option value="AUD">AUD ($)</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit" class="btn" style="width: 100%; margin-top: 10px;">
+        Process Gateway Authorization & Audit &rarr;
+      </button>
+
+    </form>
+  </div>
+
+  <!-- Real-Time BIN Inspector & Card Preview Column -->
+  <div>
+    <div class="panel">
+      <h2>Real-Time BIN & Luhn Inspector</h2>
+      
+      <div class="bin-inspector-card">
+        <div class="bin-header">
+          <div id="bin-brand-badge" class="bin-brand-badge">VISA</div>
+          <div id="bin-bank-name" class="bin-bank-name">JPMorgan Chase Bank, N.A.</div>
+        </div>
+
+        <div class="bin-spec-grid">
+          <div class="bin-spec-item">
+            <div class="bin-spec-label">BIN Prefix (First 6)</div>
+            <div class="bin-spec-val input-mono" id="spec-bin">411111</div>
+          </div>
+          <div class="bin-spec-item">
+            <div class="bin-spec-label">Luhn Checksum</div>
+            <div class="bin-spec-val" id="spec-luhn">
+              <span class="pill pill-pass">VALID MOD-10</span>
+            </div>
+          </div>
+          <div class="bin-spec-item">
+            <div class="bin-spec-label">Card Type / Class</div>
+            <div class="bin-spec-val" id="spec-type">CREDIT</div>
+          </div>
+          <div class="bin-spec-item">
+            <div class="bin-spec-label">Card Tier Level</div>
+            <div class="bin-spec-val" id="spec-level">SIGNATURE</div>
+          </div>
+          <div class="bin-spec-item">
+            <div class="bin-spec-label">Issuer Country</div>
+            <div class="bin-spec-val" id="spec-country">United States (US)</div>
+          </div>
+          <div class="bin-spec-item">
+            <div class="bin-spec-label">CVV Format</div>
+            <div class="bin-spec-val" id="spec-cvv">3 Digits Required</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 20px;">
+        <h3 style="font-size: 14px; margin-bottom: 10px; color: var(--text-muted);">Quick Test Presets & Audit Vectors:</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+          <button type="button" class="btn btn-secondary" style="font-size: 11px; padding: 6px 10px;" onclick="loadPreset('4111111111111111', '12/28', '888', 'Visa Signature')">
+            Visa (Chase)
+          </button>
+          <button type="button" class="btn btn-secondary" style="font-size: 11px; padding: 6px 10px;" onclick="loadPreset('5100000000000004', '10/27', '999', 'Mastercard World Elite')">
+            Mastercard (BoA)
+          </button>
+          <button type="button" class="btn btn-secondary" style="font-size: 11px; padding: 6px 10px;" onclick="loadPreset('371234567890123', '08/29', '1234', 'Amex Centurion')">
+            Amex Centurion
+          </button>
+          <button type="button" class="btn btn-secondary" style="font-size: 11px; padding: 6px 10px;" onclick="loadPreset('4500001234567890', '05/27', '456', 'Equity Bank Visa')">
+            Equity Bank Visa
+          </button>
+          <button type="button" class="btn btn-secondary" style="font-size: 11px; padding: 6px 10px;" onclick="loadPreset('4111111111111112', '12/28', '888', 'Invalid Luhn Test')">
+            Invalid Luhn Test
+          </button>
+          <button type="button" class="btn btn-secondary" style="font-size: 11px; padding: 6px 10px;" onclick="loadPreset('4111111111110003', '12/28', '888', 'Fraud Trigger Test')">
+            Fraud Risk Trigger (0003)
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function updateBinInspector() {
+  const cardNumber = document.getElementById('card_number').value;
+  
+  fetch('/api/bin-lookup', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'card_number=' + encodeURIComponent(cardNumber)
+  })
+  .then(response => response.json())
+  .then(data => {
+    document.getElementById('bin-brand-badge').innerText = data.card_brand || 'UNKNOWN';
+    document.getElementById('bin-bank-name').innerText = data.issuer_bank || 'Generic Bank';
+    document.getElementById('spec-bin').innerText = data.bin_prefix || '------';
+    document.getElementById('spec-type').innerText = data.card_type || 'CREDIT';
+    document.getElementById('spec-level').innerText = data.card_level || 'STANDARD';
+    document.getElementById('spec-country').innerText = (data.country_name || 'International') + ' (' + (data.country_code || 'INT') + ')';
+    document.getElementById('spec-cvv').innerText = (data.cvv_required_length || 3) + ' Digits Required';
+
+    const luhnElem = document.getElementById('spec-luhn');
+    if (data.is_luhn_valid) {
+      luhnElem.innerHTML = '<span class="pill pill-pass">VALID MOD-10</span>';
+    } else {
+      luhnElem.innerHTML = '<span class="pill pill-high">INVALID CHECKSUM</span>';
+    }
+  })
+  .catch(err => console.error('BIN Lookup error:', err));
+}
+
+document.getElementById('card_number').addEventListener('input', updateBinInspector);
+
+function loadPreset(num, exp, cvv, label) {
+  document.getElementById('card_number').value = num;
+  document.getElementById('expiry').value = exp;
+  document.getElementById('cvv').value = cvv;
+  updateBinInspector();
+}
+
+// Initial trigger
+updateBinInspector();
+</script>
+{% endblock %}

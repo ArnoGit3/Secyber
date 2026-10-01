@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}ARNTECH - SQL Injection Security Audit{% endblock %}
+{% block content %}
+
+<div class="page-header-banner">
+  <div class="page-title">
+    <span>🗄️</span> SQL Injection Security Audit & Parameterization Lab
+  </div>
+  <p class="page-desc">
+    Evaluates database query construction against SQL injection attack vectors. Toggle security mode to compare raw string interpolation against prepared parameter binding.
+  </p>
+</div>
+
+<div class="panel">
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+    <h3>Database Catalog Audit Endpoint</h3>
+    <span class="pill {{ 'pill-high' if vulnerable else 'pill-pass' }}">
+      MODE: {{ 'VULNERABLE (RAW INTERPOLATION)' if vulnerable else 'SECURE (PARAMETERIZED)' }}
+    </span>
+  </div>
+
+  <form method="POST">
+    <div class="form-group">
+      <label>Search Inventory Catalog</label>
+      <input type="text" name="q" value="{{ search or '' }}" placeholder="Try normal term (e.g. Firewall) or vector: %' OR '1'='1" class="input-mono">
+    </div>
+    <button type="submit" class="btn">Execute Query Audit</button>
+  </form>
+
+  {% if query_shown %}
+  <div style="margin-top: 20px;">
+    <label>Executed Database SQL Statement:</label>
+    <pre class="code-block">{{ query_shown }}</pre>
+  </div>
+  {% endif %}
+
+  {% if error %}
+  <div style="margin-top: 16px; background: var(--accent-red-bg); border: 1px solid var(--accent-red); padding: 12px; border-radius: 6px; color: var(--accent-red); font-family: var(--font-mono); font-size: 13px;">
+    SQL Driver Error Exception: {{ error }}
+  </div>
+  {% endif %}
+
+  {% if results %}
+  <div style="margin-top: 20px;">
+    <label>Query Results Returned ({{ results|length }} rows):</label>
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Item Name</th><th>Category</th><th>Price ($)</th></tr>
+      </thead>
+      <tbody>
+        {% for r in results %}
+        <tr>
+          <td class="input-mono">{{ r['id'] }}</td>
+          <td style="font-weight: 600;">{{ r['name'] }}</td>
+          <td><span class="pill pill-warning">{{ r['category'] }}</span></td>
+          <td class="input-mono">${{ "%.2f"|format(r['price']) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</div>
+
+<div class="grid-2">
+  <div class="panel">
+    <h3>Vulnerable Mode Pattern</h3>
+    <pre class="code-block"># String interpolation vulnerability
+query = f"SELECT id, name, category, price FROM products WHERE name LIKE '%{search}%'"
+cur.execute(query)</pre>
+  </div>
+  <div class="panel">
+    <h3>Secure Hardened Pattern</h3>
+    <pre class="code-block"># Parameterized prepared statement
+query = "SELECT id, name, category, price FROM products WHERE name LIKE ?"
+cur.execute(query, (f"%{search}%",))</pre>
+  </div>
+</div>
+
+<div class="panel">
+  <h3>Technical Audit Analysis</h3>
+  <p style="color: var(--text-muted); font-size: 14px;">
+    Direct concatenation of user input into dynamic SQL strings merges input data with SQL grammar. Attacker-supplied strings containing SQL control characters (such as single quotes <code>'</code> or comment markers <code>--</code>) alter the SQL execution tree. Prepared statements separate code compilation from data evaluation, neutralizing injection vectors regardless of input structure.
+  </p>
+</div>
+
+{% endblock %}

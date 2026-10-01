@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}ARNTECH - File Upload Security Audit{% endblock %}
+{% block content %}
+
+<div class="page-header-banner">
+  <div class="page-title">
+    <span>📁</span> File Upload Policy & Extension Audit
+  </div>
+  <p class="page-desc">
+    Evaluates file upload ingestion security. Verifies extension allowlisting, size quota enforcement, path traversal sanitization, and execution safety.
+  </p>
+</div>
+
+<div class="panel">
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+    <h3>File Ingestion Endpoint Audit</h3>
+    <span class="pill {{ 'pill-high' if vulnerable else 'pill-pass' }}">
+      MODE: {{ 'VULNERABLE (UNRESTRICTED EXTENSION/SIZE)' if vulnerable else 'SECURE (ALLOWLIST & 2MB LIMIT)' }}
+    </span>
+  </div>
+
+  <form method="POST" enctype="multipart/form-data">
+    <div class="form-group">
+      <label>Select Audit File</label>
+      <input type="file" name="file" required style="background: var(--bg-subtle); padding: 10px; border-radius: 6px; border: 1px solid var(--panel-border);">
+    </div>
+    <button type="submit" class="btn">Upload & Execute Content Inspection &rarr;</button>
+  </form>
+
+  {% if message %}
+  <div style="margin-top: 20px; background: {% if 'passed' in message.lower() or 'safely' in message.lower() %}var(--accent-green-bg){% else %}var(--accent-red-bg){% endif %}; border: 1px solid {% if 'passed' in message.lower() or 'safely' in message.lower() %}var(--accent-green){% else %}var(--accent-red){% endif %}; padding: 14px; border-radius: 6px; color: {% if 'passed' in message.lower() or 'safely' in message.lower() %}var(--accent-green){% else %}var(--accent-red){% endif %}; font-size: 14px; font-weight: 600;">
+    {{ message }}
+  </div>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h3>Technical Audit Analysis</h3>
+  <ul>
+    <li><b>Strict Extension Allowlisting:</b> Accept only explicitly permitted static file extensions (e.g. <code>.png</code>, <code>.jpg</code>, <code>.pdf</code>, <code>.txt</code>). Reject executable or script extensions.</li>
+    <li><b>File Size Quota:</b> Enforce maximum upload size (e.g. 2 MB) to prevent resource exhaustion and denial-of-service.</li>
+    <li><b>Filename Sanitization:</b> Use <code>secure_filename()</code> to strip path traversal sequences (e.g. <code>../../</code>).</li>
+    <li><b>Isolated Storage Directory:</b> Store uploaded files in a non-executable directory outside web server document root.</li>
+  </ul>
+</div>
+
+{% endblock %}

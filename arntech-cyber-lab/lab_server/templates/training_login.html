@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}ARNTECH - Enterprise Portal Authentication Audit{% endblock %}
+{% block content %}
+
+<div class="page-header-banner">
+  <div class="page-title">
+    <span>🔐</span> Enterprise Portal Authentication Security Audit
+  </div>
+  <p class="page-desc">
+    Simulates brand authentication portal security audit. Evaluates form input handling, domain verification flags, and credential transmission protection.
+  </p>
+</div>
+
+<div class="panel">
+  <h2>{{ university }} Enterprise Single Sign-On Portal</h2>
+  <form method="POST">
+    <div class="form-group">
+      <label>User Identifier / Corporate Email</label>
+      <input type="text" name="username" placeholder="analyst@{{ domain }}" class="input-mono" required>
+    </div>
+    <div class="form-group">
+      <label>Account Security Password</label>
+      <input type="password" name="password" placeholder="••••••••••••" class="input-mono" required>
+    </div>
+    <button type="submit" class="btn">Authenticate Credentials &rarr;</button>
+  </form>
+</div>
+
+<div class="panel">
+  <h3>Audit Verification Checklist</h3>
+  <ul>
+    <li><b>Domain & SSL Validation:</b> Always verify host domain (<code>arntech-security.internal</code>) against TLS certificates.</li>
+    <li><b>Phishing-Resistant MFA:</b> Enforce FIDO2 / WebAuthn passkeys to mitigate adversary-in-the-middle credential capture.</li>
+    <li><b>Password Manager Domain Binding:</b> Password managers restrict auto-fill strictly to verified domain origins.</li>
+  </ul>
+</div>
+
+{% endblock %}

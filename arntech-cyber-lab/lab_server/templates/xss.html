@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}ARNTECH - Cross-Site Scripting (XSS) Security Audit{% endblock %}
+{% block content %}
+
+<div class="page-header-banner">
+  <div class="page-title">
+    <span>🛡️</span> Cross-Site Scripting (XSS) Context Audit Lab
+  </div>
+  <p class="page-desc">
+    Evaluates reflected and stored Cross-Site Scripting vulnerabilities. Verifies HTML entity encoding, DOM execution context boundaries, and Content-Security-Policy defense rules.
+  </p>
+</div>
+
+<div class="grid-2">
+  <!-- Reflected XSS Audit -->
+  <div class="panel">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+      <h3>Reflected XSS Audit</h3>
+      <span class="pill {{ 'pill-high' if vulnerable else 'pill-pass' }}">
+        {{ 'UNESCAPED (SAFE FLAGGED)' if vulnerable else 'AUTO-ESCAPED' }}
+      </span>
+    </div>
+    <form method="GET">
+      <div class="form-group">
+        <label>Reflected Parameter Payload</label>
+        <input type="text" name="msg" value="{{ reflected_input }}" placeholder="Payload: &lt;script&gt;alert(document.cookie)&lt;/script&gt;" class="input-mono">
+      </div>
+      <button type="submit" class="btn">Test Reflected Context</button>
+    </form>
+    
+    <div style="margin-top: 18px;">
+      <label>Reflected Context Execution Output:</label>
+      <div style="background: var(--bg-subtle); border: 1px solid var(--panel-border); padding: 14px; border-radius: 6px; font-size: 14px; min-height: 50px;">
+        {% if vulnerable %}
+          {{ reflected_input | safe }}
+        {% else %}
+          {{ reflected_input }}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Stored XSS Audit -->
+  <div class="panel">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+      <h3>Stored XSS Audit Log</h3>
+      <span class="pill {{ 'pill-high' if vulnerable else 'pill-pass' }}">
+        {{ 'PERSISTED UNESCAPED' if vulnerable else 'PERSISTED ESCAPED' }}
+      </span>
+    </div>
+    <form method="POST">
+      <div class="form-group">
+        <label>Auditor Name</label>
+        <input type="text" name="author" value="sec_auditor" class="input-mono">
+      </div>
+      <div class="form-group">
+        <label>Audit Comment / Stored Payload</label>
+        <textarea name="body" rows="2" placeholder="Payload: &lt;img src=x onerror=alert(1)&gt;" class="input-mono"></textarea>
+      </div>
+      <button type="submit" class="btn btn-secondary">Post Stored Payload</button>
+    </form>
+  </div>
+</div>
+
+<div class="panel">
+  <h3>Persisted Database Comments & Audit Logs</h3>
+  {% for c in comments %}
+  <div style="background: var(--bg-subtle); border: 1px solid var(--panel-border); padding: 14px; border-radius: 6px; margin-bottom: 10px;">
+    <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 6px;">
+      <span style="font-weight: 700; color: var(--primary);">{{ c['author'] }}</span>
+      <span class="input-mono">{{ c['created_at'] }}</span>
+    </div>
+    <div style="font-size: 14px;">
+      {% if vulnerable %}
+        {{ c['body'] | safe }}
+      {% else %}
+        {{ c['body'] }}
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="panel">
+  <h3>Technical Audit Analysis</h3>
+  <p style="color: var(--text-muted); font-size: 14px;">
+    In vulnerable mode, untrusted HTML output bypasses template escaping via explicit raw rendering (<code>| safe</code>). This allows attacker-supplied JavaScript payloads (e.g. <code>&lt;script&gt;</code> or event handler attributes) to execute within the session context of any visiting browser. Enforcing strict contextual output encoding transforms HTML control characters (<code>&lt;</code>, <code>&gt;</code>, <code>&quot;</code>, <code>&amp;</code>) into safe inert entities, preventing DOM execution.
+  </p>
+</div>
+
+{% endblock %}

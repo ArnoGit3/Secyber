@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}ARNTECH - Authentication & Lockout Policy Audit{% endblock %}
+{% block content %}
+
+<div class="page-header-banner">
+  <div class="page-title">
+    <span>🔑</span> Authentication Security & Rate Limiting Audit Lab
+  </div>
+  <p class="page-desc">
+    Evaluates authentication policy design, username enumeration vectors in error messaging, and brute-force protection rate limiting controls.
+  </p>
+</div>
+
+<div class="panel">
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+    <h3>Authentication Gateway Terminal</h3>
+    {% if vulnerable %}
+      <span class="pill pill-high">MODE: VULNERABLE (VERBOSE ERRORS / NO LOCKOUT)</span>
+    {% else %}
+      <span class="pill pill-pass">MODE: SECURE (GENERIC / 3-FAIL LOCKOUT)</span>
+    {% endif %}
+  </div>
+
+  <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">
+    Test credentials: <code>audit_analyst</code> / <code>SecuredPass2026!</code>
+  </p>
+
+  <form method="POST">
+    <div class="form-group">
+      <label>User Identifier</label>
+      <input type="text" name="username" class="input-mono" placeholder="Enter username" required>
+    </div>
+    <div class="form-group">
+      <label>Password Credential</label>
+      <input type="password" name="password" class="input-mono" placeholder="Enter password" required>
+    </div>
+    {% if locked_out %}
+      <button type="submit" class="btn" disabled style="opacity: 0.5; cursor: not-allowed;">
+        Authenticate Endpoint &rarr;
+      </button>
+    {% else %}
+      <button type="submit" class="btn">
+        Authenticate Endpoint &rarr;
+      </button>
+    {% endif %}
+  </form>
+
+  {% if message %}
+    {% if 'successful' in message.lower() %}
+      <div style="margin-top: 20px; background: var(--accent-green-bg); border: 1px solid var(--accent-green); padding: 14px; border-radius: 6px; color: var(--accent-green); font-size: 14px; font-weight: 600;">
+        {{ message }}
+      </div>
+    {% else %}
+      <div style="margin-top: 20px; background: var(--accent-red-bg); border: 1px solid var(--accent-red); padding: 14px; border-radius: 6px; color: var(--accent-red); font-size: 14px; font-weight: 600;">
+        {{ message }}
+      </div>
+    {% endif %}
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h3>Technical Audit Analysis</h3>
+  <p style="color: var(--text-muted); font-size: 14px;">
+    Verbose authentication errors (such as distinguishing "User account not found" from "Incorrect password") leak internal directory state to unauthorized callers, enabling automated account enumeration. Furthermore, lack of rate limiting allows high-speed brute-force attacks. Hardened authentication systems respond with uniform generic credentials errors and enforce progressive account lockout after repeated failed attempts.
+  </p>
+</div>
+
+{% endblock %}

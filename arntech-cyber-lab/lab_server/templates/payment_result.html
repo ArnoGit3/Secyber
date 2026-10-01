@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block title %}ARNTECH - Payment Gateway Authorization Result{% endblock %}
+{% block content %}
+
+<div class="page-header-banner">
+  <div class="page-title">
+    {% if gw.status == 'APPROVED' %}
+      <span style="color: var(--accent-green);">✓</span> Payment Gateway Authorization Approved
+    {% else %}
+      <span style="color: var(--accent-red);">✕</span> Payment Gateway Authorization Declined
+    {% endif %}
+  </div>
+  <p class="page-desc">
+    Transaction audit complete. Real-time Modulo-10 checksum, BIN identification database, and enterprise gateway rule evaluation completed in {{ gw.latency_ms }} ms.
+  </p>
+</div>
+
+<div class="grid-2">
+
+  <!-- Transaction Details & Audit Card -->
+  <div class="panel">
+    <h2>Transaction Authorization Summary</h2>
+    <table>
+      <tr>
+        <th>Gateway Status</th>
+        <td>
+          {% if gw.status == 'APPROVED' %}
+            <span class="pill pill-approved">AUTHORIZED & CAPTURED</span>
+          {% else %}
+            <span class="pill pill-declined">{{ gw.response_code }}</span>
+          {% endif %}
+        </td>
+      </tr>
+      <tr><th>Authorization Code</th><td class="input-mono">{{ gw.auth_code or 'NONE (DECLINED)' }}</td></tr>
+      <tr><th>Transaction Reference ID</th><td class="input-mono">{{ gw.transaction_id }}</td></tr>
+      <tr><th>Cardholder Name</th><td>{{ cardholder }}</td></tr>
+      <tr><th>Primary Account Number</th><td class="input-mono">{{ card_masked }}</td></tr>
+      <tr><th>Amount Authorized</th><td class="input-mono" style="font-weight: 700; color: var(--primary);">{{ gw.amount }} {{ gw.currency }}</td></tr>
+      <tr><th>Gateway Processing Latency</th><td class="input-mono">{{ gw.latency_ms }} ms</td></tr>
+      <tr><th>Gateway Protocol</th><td>{{ gw.gateway_protocol }}</td></tr>
+      <tr><th>Gateway Message</th><td>{{ gw.message }}</td></tr>
+    </table>
+
+    <div class="risk-meter-wrapper">
+      <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600;">
+        <span>Gateway Fraud Risk Score</span>
+        {% if gw.risk_score > 70 %}
+          <span style="color: var(--accent-red);">{{ gw.risk_score }} / 100</span>
+        {% elif gw.risk_score > 40 %}
+          <span style="color: var(--accent-amber);">{{ gw.risk_score }} / 100</span>
+        {% else %}
+          <span style="color: var(--accent-green);">{{ gw.risk_score }} / 100</span>
+        {% endif %}
+      </div>
+      <div class="risk-bar-container">
+        {% if gw.risk_score > 70 %}
+          <div class="risk-bar-fill" style="width: {{ gw.risk_score }}%; background: var(--accent-red);"></div>
+        {% elif gw.risk_score > 40 %}
+          <div class="risk-bar-fill" style="width: {{ gw.risk_score }}%; background: var(--accent-amber);"></div>
+        {% else %}
+          <div class="risk-bar-fill" style="width: {{ gw.risk_score }}%; background: var(--accent-green);"></div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- BIN Intelligence Breakdown Card -->
+  <div class="panel">
+    <h2>BIN Intelligence & Card Profile</h2>
+    <div class="bin-inspector-card">
+      <div class="bin-header">
+        <div class="bin-brand-badge">{{ bin_info.card_brand }}</div>
+        <div class="bin-bank-name">{{ bin_info.issuer_bank }}</div>
+      </div>
+      <div class="bin-spec-grid">
+        <div class="bin-spec-item">
+          <div class="bin-spec-label">BIN Prefix</div>
+          <div class="bin-spec-val input-mono">{{ bin_info.bin_prefix }}</div>
+        </div>
+        <div class="bin-spec-item">
+          <div class="bin-spec-label">Luhn Checksum</div>
+          <div class="bin-spec-val">
+            {% if bin_info.is_luhn_valid %}
+              <span class="pill pill-pass">VALID MOD-10</span>
+            {% else %}
+              <span class="pill pill-high">INVALID CHECKSUM</span>
+            {% endif %}
+          </div>
+        </div>
+        <div class="bin-spec-item">
+          <div class="bin-spec-label">Card Type / Class</div>
+          <div class="bin-spec-val">{{ bin_info.card_type }}</div>
+        </div>
+        <div class="bin-spec-item">
+          <div class="bin-spec-label">Card Tier Level</div>
+          <div class="bin-spec-val">{{ bin_info.card_level }}</div>
+        </div>
+        <div class="bin-spec-item">
+          <div class="bin-spec-label">Issuer Country</div>
+          <div class="bin-spec-val">{{ bin_info.country_name }} ({{ bin_info.country_code }})</div>
+        </div>
+        <div class="bin-spec-item">
+          <div class="bin-spec-label">Settlement Currency</div>
+          <div class="bin-spec-val">{{ bin_info.currency }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 20px;">
+      <a href="{{ url_for('payment_verification') }}" class="btn btn-secondary" style="width: 100%;">
+        &larr; Run Another Gateway Transaction Audit
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<!-- Raw Gateway Response Payload -->
+<div class="panel">
+  <h2>Raw Gateway API JSON Response Payload</h2>
+  <pre class="code-block">{
+  "status": "{{ gw.status }}",
+  "response_code": "{{ gw.response_code }}",
+  "error_code": "{{ gw.error_code }}",
+  "auth_code": "{{ gw.auth_code }}",
+  "transaction_id": "{{ gw.transaction_id }}",
+  "processed_at": "{{ gw.processed_at }}",
+  "amount": "{{ gw.amount }}",
+  "currency": "{{ gw.currency }}",
+  "latency_ms": {{ gw.latency_ms }},
+  "risk_score": {{ gw.risk_score }},
+  "bin_intelligence": {
+    "bin_prefix": "{{ bin_info.bin_prefix }}",
+    "card_brand": "{{ bin_info.card_brand }}",
+    "card_type": "{{ bin_info.card_type }}",
+    "card_level": "{{ bin_info.card_level }}",
+    "issuer_bank": "{{ bin_info.issuer_bank }}",
+    "country": "{{ bin_info.country_name }}",
+    "luhn_valid": {{ 'true' if bin_info.is_luhn_valid else 'false' }}
+  }
+}</pre>
+</div>
+
+<div class="panel">
+  <h2>Enterprise Gateway Security & PCI-DSS Audit Controls</h2>
+  <ul>
+    <li><b>Tokenization & Encryption:</b> Production payment systems must tokenize PANs immediately at the gateway ingress point. Storing unencrypted PAN or CVV violates PCI-DSS Requirement 3.4.</li>
+    <li><b>3-D Secure 2.0 (EMV 3DS):</b> Enforces risk-based authentication (RBA) out-of-band biometric or OTP authorization challenge to eliminate carding and stolen card replay.</li>
+    <li><b>Modulo-10 Checksum & BIN Risk Engine:</b> Client and server-side Luhn verification eliminates invalid digit carding attempts before gateway submission.</li>
+    <li><b>Velocity & Fraud Rules:</b> Real-time velocity checks block automated card testing scripts and brute-force CVV enumeration attacks.</li>
+  </ul>
+</div>
+
+{% endblock %}
